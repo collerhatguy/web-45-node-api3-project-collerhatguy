@@ -7,7 +7,7 @@ module.exports = {
   insert,
   update,
   remove,
-};
+}
 
 function get() {
   return db('users');
