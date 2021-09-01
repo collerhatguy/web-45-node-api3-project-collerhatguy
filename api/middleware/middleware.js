@@ -27,8 +27,8 @@ function validateUser(req, res, next) {
 
 function validatePost(req, res, next) {
   // DO YOUR MAGIC
-  const { body } = req
-  body.text ? next() : res.status(400).json({ message: "missing required text field" })
+  const { body: { text } } = req
+  text ? next() : res.status(400).json({ message: "missing required text field" })
 }
 
 // do not forget to expose these functions to other modules

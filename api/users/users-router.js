@@ -1,7 +1,6 @@
 const express = require('express');
 const {
   get,
-  getById,
   getUserPosts,
   insert,
   update,
@@ -10,7 +9,7 @@ const {
 const {
   insert: insertPost,
 } = require("../posts/posts-model")
-const { logger, validateUserId, validateUser, validatePost } = require("../middleware/middleware")
+const { validateUserId, validateUser, validatePost } = require("../middleware/middleware")
  
 // You will need `users-model.js` and `posts-model.js` both
 // The middleware functions also need to be required
@@ -37,14 +36,14 @@ router.post('/', validateUser, async (req, res) => {
   // RETURN THE NEWLY CREATED USER OBJECT
   // this needs a middleware to check that the request body is valid
   try {
-    const createdUser = await insert(req.user)
+    const createdUser = await insert(req.body)
     res.status(201).json(createdUser)
   } catch(err) {
     res.status(500).json(err)
   }
 });
 
-router.put('/:id', validateUserId, validatePost, async (req, res) => {
+router.put('/:id', validateUserId, validateUser, async (req, res) => {
   // RETURN THE FRESHLY UPDATED USER OBJECT
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
@@ -61,8 +60,9 @@ router.delete('/:id', validateUserId, async (req, res) => {
   // RETURN THE FRESHLY DELETED USER OBJECT
   // this needs a middleware to verify user id
   try {
-    await remove(req.params.id)
-    res.status(200).json()
+    const { params: { id }, user } = req
+    await remove(id)
+    res.status(200).json(user)
   } catch(err) {
     res.status(500).json(err)
   }
@@ -79,7 +79,7 @@ router.get('/:id/posts', validateUserId, async (req, res) => {
   }
 });
 
-router.post('/:id/posts', validateUserId, validateUser, async (req, res) => {
+router.post('/:id/posts', validateUserId, validatePost, async (req, res) => {
   // RETURN THE NEWLY CREATED USER POST
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
@@ -90,6 +90,7 @@ router.post('/:id/posts', validateUserId, validateUser, async (req, res) => {
     res.status(500).json(err)
   }
 });
+
 
 // do not forget to export the router
 module.exports = router
